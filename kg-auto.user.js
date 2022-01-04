@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.5
+// @version         1.6
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
