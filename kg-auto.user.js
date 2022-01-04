@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.6
+// @version         1.6.1
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -68,10 +68,10 @@ const togglableCrafts = [
 function insertToggleFor(options) {
     const checkboxId = options.resourceName + 'Toggle';
     const label = options.labelOverride || (options.resourceName + ' craft');
-    const defaultState = options.defaultState === false ? 'false' : 'true';
+    const defaultState = options.defaultState === false ? '' : 'checked';
     const toggle
         = '<label for="' + checkboxId + '">' + label + '</label>'
-        + '<input type="checkbox" id="' + checkboxId + '" checked="' + defaultState + '">|\n';
+        + '<input type="checkbox" id="' + checkboxId + '" ' + defaultState + '>|\n';
 
     const footer = document.getElementById("footerLinks");
 
