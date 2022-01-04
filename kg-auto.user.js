@@ -15,6 +15,7 @@
 // Resources
 const alloy = 'alloy';
 const beam = 'beam';
+const blueprint = 'blueprint';
 const catnip = 'catnip';
 const catpower = 'manpower';
 const coal = 'coal';
@@ -48,26 +49,29 @@ const craftConversions = [
     [wood,          beam],
     [minerals,      slab],
     [iron,          plate],
-    [culture,       manuscript],
     [coal,          steel],
+    [culture,       manuscript],
     [science,       compendium],
+    [science,       blueprint],
     [titanium,      alloy],
 ];
 
 const togglableCrafts = [
-    manuscript,
-    compendium,
+    [manuscript,    true],
+    [compendium,    true],
+    [blueprint,     false],
 ]
 
 /**
  * Checkboxes
  */
-function insertToggleFor(resourceName, labelOverride) {
-    const checkboxId = resourceName + 'Toggle';
-    const label = labelOverride || (resourceName + ' craft');
+function insertToggleFor(options) {
+    const checkboxId = options.resourceName + 'Toggle';
+    const label = options.labelOverride || (options.resourceName + ' craft');
+    const defaultState = options.defaultState === false ? 'false' : 'true';
     const toggle
         = '<label for="' + checkboxId + '">' + label + '</label>'
-        + '<input type="checkbox" id="' + checkboxId + '" checked="true">|\n';
+        + '<input type="checkbox" id="' + checkboxId + '" checked="' + defaultState + '">|\n';
 
     const footer = document.getElementById("footerLinks");
 
@@ -80,8 +84,11 @@ function insertToggleFor(resourceName, labelOverride) {
 
 function insertCraftToggles() {
     const craftsMap = {};
-    for (const resource of togglableCrafts) {
-        craftsMap[resource] = insertToggleFor(resource);
+    for (const [resource, defaultVal] of togglableCrafts) {
+        craftsMap[resource] = insertToggleFor({
+            resourceName: resource,
+            defaultState: defaultVal
+        });
     }
 
     return resourceName => {
@@ -93,23 +100,6 @@ function insertCraftToggles() {
 /**
  * Craft helpers
  */
-function isNearLimit(resourceName) {
-    return document
-        .querySelector('.resource_' + resourceName + ' .resLimitNotice');
-}
-
-function craft1pc(resourceName) {
-    document
-        .querySelector('.resource_' + resourceName + ' .craft-1pc')
-        .click();
-}
-
-function craftAll(resourceName) {
-    document
-        .querySelector('.resource_' + resourceName + ' .all')
-        .click();
-}
-
 function tryUse(selector) {
     const element = document.querySelector(selector);
     if (element) {
@@ -117,12 +107,28 @@ function tryUse(selector) {
     }
 }
 
+function isNearLimit(resourceName) {
+    return document
+        .querySelector('.resource_' + resourceName + ' .resLimitNotice');
+}
+
+function craft1pc(resourceName) {
+    tryUse('.resource_' + resourceName + ' .craft-1pc')
+}
+
+function craftAll(resourceName) {
+    tryUse('.resource_' + resourceName + ' .all')
+}
+
 
 /**
  * Main automation
  */
 const isAutomationDisabled
-    = insertToggleFor('automation', 'Automation');
+    = insertToggleFor({
+        resourceName: 'automation',
+        labelOverride: 'Automation'
+    });
 
 const isCraftDisabledFor = insertCraftToggles();
 
