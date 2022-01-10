@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.8
+// @version         1.9
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -108,7 +108,7 @@ function insertCraftToggles() {
 
 function insertActionToggles() {
     const actionsMap = {};
-    for (const [resource, defaultVal, label] of togglableCrafts) {
+    for (const [resource, defaultVal, label] of togglableActions) {
         actionsMap[resource] = insertToggleFor({
             resourceName: resource,
             defaultState: defaultVal,
