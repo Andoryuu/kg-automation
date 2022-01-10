@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.7
+// @version         1.8
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -23,8 +23,10 @@ const compendium = 'compedium'; // yes, compedium
 const culture = 'culture';
 const faith = 'faith';
 const iron = 'iron';
+const kerosene = 'kerosene';
 const manuscript = 'manuscript';
 const minerals = 'minerals';
+const oil = 'oil';
 const parchment = 'parchment';
 const plate = 'plate';
 const science = 'science';
@@ -42,7 +44,12 @@ const observe = '#observeButton input';
 const actionConversions = [
     [catpower,      fastHunt],
     [faith,         fastPraise],
-]
+];
+
+const togglableActions = [
+    [catpower,      true,       'auto hunt'],
+    [faith,         true,       'auto praise'],
+];
 
 const craftConversions = [
     [catnip,        wood],
@@ -54,13 +61,15 @@ const craftConversions = [
     [science,       compendium],
     [science,       blueprint],
     [titanium,      alloy],
+    [oil,           kerosene],
 ];
 
 const togglableCrafts = [
     [manuscript,    true],
     [compendium,    true],
     [blueprint,     false],
-]
+    [kerosene,      false],
+];
 
 /**
  * Checkboxes
@@ -93,6 +102,22 @@ function insertCraftToggles() {
 
     return resourceName => {
         const isDisabled = craftsMap[resourceName];
+        return isDisabled && isDisabled()
+    }
+}
+
+function insertActionToggles() {
+    const actionsMap = {};
+    for (const [resource, defaultVal, label] of togglableCrafts) {
+        actionsMap[resource] = insertToggleFor({
+            resourceName: resource,
+            defaultState: defaultVal,
+            labelOverride: label
+        });
+    }
+
+    return resourceName => {
+        const isDisabled = actionsMap[resourceName];
         return isDisabled && isDisabled()
     }
 }
@@ -131,6 +156,7 @@ const isAutomationDisabled
     });
 
 const isCraftDisabledFor = insertCraftToggles();
+const isActionDisabledFor = insertActionToggles();
 
 setInterval(() => {
 
@@ -141,6 +167,10 @@ setInterval(() => {
     tryUse(observe);
 
     for (const [source, action] of actionConversions) {
+        if (isActionDisabledFor(source)) {
+            continue;
+        }
+
         if (isNearLimit(source)) {
             tryUse(action);
         }
@@ -158,4 +188,4 @@ setInterval(() => {
 
     craftAll(parchment);
 
-}, 1000)
+}, 300)
