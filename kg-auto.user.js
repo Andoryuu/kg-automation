@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.9
+// @version         1.10
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -33,6 +33,8 @@ const science = 'science';
 const slab = 'slab';
 const steel = 'steel';
 const titanium = 'titanium';
+const thorium = 'thorium';
+const uranium = 'uranium';
 const wood = 'wood';
 
 // Actions
@@ -62,6 +64,7 @@ const craftConversions = [
     [science,       blueprint],
     [titanium,      alloy],
     [oil,           kerosene],
+    [uranium,       thorium],
 ];
 
 const togglableCrafts = [
@@ -69,22 +72,40 @@ const togglableCrafts = [
     [compendium,    true],
     [blueprint,     false],
     [kerosene,      false],
+    [thorium,       false],
 ];
 
 /**
  * Checkboxes
  */
+const toggleContainer = 'automationTogglesContainer';
+
+function insertToggleContainer() {
+    if (document.getElementById(toggleContainer)) {
+        return;
+    }
+
+    const container
+        = '<div style="text-align: end; margin-bottom: 30px;"></div>';
+
+    const footer = document.getElementById('footerLinks');
+
+    footer.insertAdjacentHTML('afterbegin', container);
+}
+
 function insertToggleFor(options) {
     const checkboxId = options.resourceName + 'Toggle';
     const label = options.labelOverride || (options.resourceName + ' craft');
     const defaultState = options.defaultState === false ? '' : 'checked';
     const toggle
-        = '<label for="' + checkboxId + '">' + label + '</label>'
-        + '<input type="checkbox" id="' + checkboxId + '" ' + defaultState + '>|\n';
+        = '<div>'
+        + '<label for="' + checkboxId + '">' + label + '</label> '
+        + '<input type="checkbox" id="' + checkboxId + '" ' + defaultState + '>|\n'
+        + '</div>';
 
-    const footer = document.getElementById("footerLinks");
+    const container = document.getElementById(toggleContainer);
 
-    footer.insertAdjacentHTML('afterbegin', toggle);
+    container.insertAdjacentHTML('afterbegin', toggle);
 
     return () => !document
         .getElementById(checkboxId)
@@ -149,14 +170,17 @@ function craftAll(resourceName) {
 /**
  * Main automation
  */
+insertToggleContainer();
+
 const isAutomationDisabled
     = insertToggleFor({
         resourceName: 'automation',
         labelOverride: 'Automation'
     });
 
-const isCraftDisabledFor = insertCraftToggles();
 const isActionDisabledFor = insertActionToggles();
+
+const isCraftDisabledFor = insertCraftToggles();
 
 setInterval(() => {
 
