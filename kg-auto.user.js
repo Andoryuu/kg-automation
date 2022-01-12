@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.10
+// @version         1.11
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -86,7 +86,7 @@ function insertToggleContainer() {
     }
 
     const container
-        = '<div style="text-align: end; margin-bottom: 30px;"></div>';
+        = '<div id="' + toggleContainer + '" style="text-align: end; margin-bottom: 30px;"></div>';
 
     const footer = document.getElementById('footerLinks');
 
