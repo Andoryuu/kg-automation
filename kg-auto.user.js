@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.11
+// @version         1.12
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -21,6 +21,7 @@ const catpower = 'manpower';
 const coal = 'coal';
 const compendium = 'compedium'; // yes, compedium
 const culture = 'culture';
+const eludium = 'eludium';
 const faith = 'faith';
 const iron = 'iron';
 const kerosene = 'kerosene';
@@ -34,6 +35,7 @@ const slab = 'slab';
 const steel = 'steel';
 const titanium = 'titanium';
 const thorium = 'thorium';
+const unobtainium = 'unobtainium';
 const uranium = 'uranium';
 const wood = 'wood';
 
@@ -65,6 +67,7 @@ const craftConversions = [
     [titanium,      alloy],
     [oil,           kerosene],
     [uranium,       thorium],
+    [unobtainium,   eludium],
 ];
 
 const togglableCrafts = [
@@ -73,6 +76,7 @@ const togglableCrafts = [
     [blueprint,     false],
     [kerosene,      false],
     [thorium,       false],
+    [eludium,       false],
 ];
 
 /**
@@ -85,8 +89,14 @@ function insertToggleContainer() {
         return;
     }
 
+    const styles = [
+        'text-align: end;',
+        'margin-bottom: 30px;',
+        'background: linear-gradient(to right, transparent, white);'
+    ].join(' ');
+
     const container
-        = '<div id="' + toggleContainer + '" style="text-align: end; margin-bottom: 30px;"></div>';
+        = '<div id="' + toggleContainer + '" style="' + styles + '"></div>';
 
     const footer = document.getElementById('footerLinks');
 
@@ -170,6 +180,8 @@ function craftAll(resourceName) {
 /**
  * Main automation
  */
+game.detailedPollutionInfo = true
+
 insertToggleContainer();
 
 const isAutomationDisabled
