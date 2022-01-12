@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.12
+// @version         1.13
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -180,8 +180,6 @@ function craftAll(resourceName) {
 /**
  * Main automation
  */
-game.detailedPollutionInfo = true
-
 insertToggleContainer();
 
 const isAutomationDisabled
@@ -225,3 +223,18 @@ setInterval(() => {
     craftAll(parchment);
 
 }, 300)
+
+
+/**
+ * After game load initializations
+ */
+const afterLoadInit = setInterval(() => {
+    if (!game) {
+        return;
+    }
+
+    game.detailedPollutionInfo = true;
+
+    clearInterval(afterLoadInit);
+
+}, 10_000)
