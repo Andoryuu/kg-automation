@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.13
+// @version         1.14
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -55,19 +55,20 @@ const togglableActions = [
     [faith,         true,       'auto praise'],
 ];
 
+// from | to | is hight throughput
 const craftConversions = [
-    [catnip,        wood],
-    [wood,          beam],
-    [minerals,      slab],
-    [iron,          plate],
-    [coal,          steel],
-    [culture,       manuscript],
-    [science,       compendium],
-    [science,       blueprint],
-    [titanium,      alloy],
-    [oil,           kerosene],
-    [uranium,       thorium],
-    [unobtainium,   eludium],
+    [catnip,        wood,           true],
+    [wood,          beam,           true],
+    [minerals,      slab,           true],
+    [iron,          plate,          true],
+    [coal,          steel,          true],
+    [culture,       manuscript,     true],
+    [science,       compendium,     true],
+    [science,       blueprint,      false],
+    [titanium,      alloy,          false],
+    [oil,           kerosene,       false],
+    [uranium,       thorium,        false],
+    [unobtainium,   eludium,        false],
 ];
 
 const togglableCrafts = [
@@ -172,6 +173,10 @@ function craft1pc(resourceName) {
     tryUse('.resource_' + resourceName + ' .craft-1pc')
 }
 
+function craft5pc(resourceName) {
+    tryUse('.resource_' + resourceName + ' .craft-5pc')
+}
+
 function craftAll(resourceName) {
     tryUse('.resource_' + resourceName + ' .all')
 }
@@ -210,19 +215,24 @@ setInterval(() => {
         }
     }
 
-    for (const [source, target] of craftConversions) {
+    for (const [source, target, isHighTP] of craftConversions) {
         if (isCraftDisabledFor(target)) {
             continue;
         }
 
         if (isNearLimit(source)) {
-            craft1pc(target);
+            if (isHighTP) {
+                craft5pc(target);
+
+            } else {
+                craft1pc(target);
+            }
         }
     }
 
     craftAll(parchment);
 
-}, 300)
+}, 500)
 
 
 /**
