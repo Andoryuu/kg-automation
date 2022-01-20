@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.14
+// @version         1.15
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -63,7 +63,7 @@ const craftConversions = [
     [iron,          plate,          true],
     [coal,          steel,          true],
     [culture,       manuscript,     true],
-    [science,       compendium,     true],
+    [science,       compendium,     false],
     [science,       blueprint,      false],
     [titanium,      alloy,          false],
     [oil,           kerosene,       false],
@@ -223,28 +223,12 @@ setInterval(() => {
         if (isNearLimit(source)) {
             if (isHighTP) {
                 craft5pc(target);
-
-            } else {
-                craft1pc(target);
             }
+
+            craft1pc(target);
         }
     }
 
     craftAll(parchment);
 
 }, 500)
-
-
-/**
- * After game load initializations
- */
-const afterLoadInit = setInterval(() => {
-    if (!game) {
-        return;
-    }
-
-    game.detailedPollutionInfo = true;
-
-    clearInterval(afterLoadInit);
-
-}, 10_000)
