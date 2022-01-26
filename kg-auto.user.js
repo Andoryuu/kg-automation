@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.16
+// @version         1.17
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -191,7 +191,7 @@ function craftAll(resourceName) {
  */
 insertToggleContainer();
 
-const isEmergencyDumpingOn
+const isEmergencyDumpingOff
     = insertToggleFor({
         resourceName: 'emergencyDump',
         labelOverride: 'Crafting overload',
@@ -232,7 +232,7 @@ setInterval(() => {
         }
 
         if (isNearLimit(source)) {
-            if (isEmergencyDumpingOn()) {
+            if (!isEmergencyDumpingOff()) {
                 craft10pc(target);
             }
 
