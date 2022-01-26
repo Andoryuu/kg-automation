@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.15
+// @version         1.16
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -63,7 +63,7 @@ const craftConversions = [
     [iron,          plate,          true],
     [coal,          steel,          true],
     [culture,       manuscript,     true],
-    [science,       compendium,     false],
+    [science,       compendium,     true],
     [science,       blueprint,      false],
     [titanium,      alloy,          false],
     [oil,           kerosene,       false],
@@ -177,6 +177,10 @@ function craft5pc(resourceName) {
     tryUse('.resource_' + resourceName + ' .craft-5pc')
 }
 
+function craft10pc(resourceName) {
+    tryUse('.resource_' + resourceName + ' .craft-10pc')
+}
+
 function craftAll(resourceName) {
     tryUse('.resource_' + resourceName + ' .all')
 }
@@ -186,6 +190,13 @@ function craftAll(resourceName) {
  * Main automation
  */
 insertToggleContainer();
+
+const isEmergencyDumpingOn
+    = insertToggleFor({
+        resourceName: 'emergencyDump',
+        labelOverride: 'Crafting overload',
+        defaultState: false
+    });
 
 const isAutomationDisabled
     = insertToggleFor({
@@ -221,6 +232,10 @@ setInterval(() => {
         }
 
         if (isNearLimit(source)) {
+            if (isEmergencyDumpingOn()) {
+                craft10pc(target);
+            }
+
             if (isHighTP) {
                 craft5pc(target);
             }
