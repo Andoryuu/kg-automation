@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.17
+// @version         1.18
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -57,24 +57,30 @@ const togglableActions = [
 
 // from | to | is hight throughput
 const craftConversions = [
-    [catnip,        wood,           true],
-    [wood,          beam,           true],
-    [minerals,      slab,           true],
-    [iron,          plate,          true],
-    [coal,          steel,          true],
-    [culture,       manuscript,     true],
-    [science,       compendium,     true],
-    [science,       blueprint,      false],
-    [titanium,      alloy,          false],
-    [oil,           kerosene,       false],
-    [uranium,       thorium,        false],
     [unobtainium,   eludium,        false],
+    [uranium,       thorium,        false],
+    [oil,           kerosene,       false],
+    [titanium,      alloy,          false],
+    [science,       blueprint,      false],
+    [science,       compendium,     true],
+    [culture,       manuscript,     true],
+    [coal,          steel,          true],
+    [iron,          plate,          true],
+    [minerals,      slab,           true],
+    [wood,          beam,           true],
+    [catnip,        wood,           true],
 ];
 
 const togglableCrafts = [
+    [wood,          true],
+    [beam,          true],
+    [slab,          true],
+    [plate,         true],
+    [steel,         true],
     [manuscript,    true],
     [compendium,    true],
     [blueprint,     false],
+    [alloy,         false],
     [kerosene,      false],
     [thorium,       false],
     [eludium,       false],
