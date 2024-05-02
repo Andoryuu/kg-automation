@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.18
+// @version         1.19
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -71,12 +71,14 @@ const craftConversions = [
     [catnip,        wood,           true],
 ];
 
+// resource | enabled by default
 const togglableCrafts = [
     [wood,          true],
     [beam,          true],
     [slab,          true],
     [plate,         true],
     [steel,         true],
+    [parchment,     true],
     [manuscript,    true],
     [compendium,    true],
     [blueprint,     false],
@@ -250,6 +252,8 @@ setInterval(() => {
         }
     }
 
-    craftAll(parchment);
+    if (!isCraftDisabledFor(parchment)) {
+        craftAll(parchment);
+    }
 
 }, 500)
