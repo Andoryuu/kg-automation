@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.20
+// @version         1.21
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -197,7 +197,13 @@ function craftAll(resourceName) {
  * Custom actions
  */
 function tryTradeWithLeviathans() {
-    if (game.resPool.resourceMap.unobtainium.value < 5000) {
+    const unobtainiumAmount = document
+        .querySelector('.resource_' + unobtainium + ' .resAmount');
+
+    if (!unobtainiumAmount
+        // 10K+ has characters which is NaN which is false
+        || +unobtainiumAmount.innerText < 5000
+    ) {
         return;
     }
 
