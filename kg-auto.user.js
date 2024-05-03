@@ -2,7 +2,7 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.19
+// @version         1.20
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
@@ -101,7 +101,7 @@ function insertToggleContainer() {
     const styles = [
         'text-align: end;',
         'margin-bottom: 30px;',
-        'background: linear-gradient(to right, transparent, white);'
+        'background: linear-gradient(to right, transparent, white);',
     ].join(' ');
 
     const container
@@ -136,7 +136,7 @@ function insertCraftToggles() {
     for (const [resource, defaultVal] of togglableCrafts) {
         craftsMap[resource] = insertToggleFor({
             resourceName: resource,
-            defaultState: defaultVal
+            defaultState: defaultVal,
         });
     }
 
@@ -152,7 +152,7 @@ function insertActionToggles() {
         actionsMap[resource] = insertToggleFor({
             resourceName: resource,
             defaultState: defaultVal,
-            labelOverride: label
+            labelOverride: label,
         });
     }
 
@@ -193,6 +193,19 @@ function craftAll(resourceName) {
     tryUse('.resource_' + resourceName + ' .all')
 }
 
+/**
+ * Custom actions
+ */
+function tryTradeWithLeviathans() {
+    if (game.resPool.resourceMap.unobtainium.value < 5000) {
+        return;
+    }
+
+    [...document.getElementsByClassName('pin-link')]
+        .find(e => e.innerText == 'Trade with Leviathans')
+        ?.firstChild
+        .click();
+}
 
 /**
  * Main automation
@@ -203,18 +216,25 @@ const isEmergencyDumpingOff
     = insertToggleFor({
         resourceName: 'emergencyDump',
         labelOverride: 'Crafting overload',
-        defaultState: false
+        defaultState: false,
     });
 
 const isAutomationDisabled
     = insertToggleFor({
         resourceName: 'automation',
-        labelOverride: 'Automation'
+        labelOverride: 'Automation',
     });
 
 const isActionDisabledFor = insertActionToggles();
 
 const isCraftDisabledFor = insertCraftToggles();
+
+const isLeviathansTradeDisabled
+    = insertToggleFor({
+        resourceName: 'leviathansTrade',
+        labelOverride: 'Leviathans trade',
+        defaultState: false,
+    })
 
 setInterval(() => {
 
@@ -254,6 +274,10 @@ setInterval(() => {
 
     if (!isCraftDisabledFor(parchment)) {
         craftAll(parchment);
+    }
+
+    if (!isLeviathansTradeDisabled()) {
+        tryTradeWithLeviathans();
     }
 
 }, 500)
