@@ -2,15 +2,13 @@
 // @name            KG automation
 // @namespace       https://github.com/Andoryuu
 // @description     Small automation for Kittens Game
-// @version         1.21
+// @version         1.22
 // @grant           none
 // @include         https://kittensgame.com/*
 // @match           https://kittensgame.com/*
 // ==/UserScript==
 
-/**
- * Definitions
- */
+// #region Definitions
 
 // Resources
 const alloy = 'alloy';
@@ -45,17 +43,19 @@ const fastPraise = '#fastPraiseContainer a';
 const observe = '#observeButton input';
 
 // Conversions
+/** @type {[resource: string, action: string][]} */
 const actionConversions = [
     [catpower,      fastHunt],
     [faith,         fastPraise],
 ];
 
+/** @type {[resource: string, defaultState: boolean, label: string][]} */
 const togglableActions = [
     [catpower,      true,       'auto hunt'],
     [faith,         true,       'auto praise'],
 ];
 
-// from | to | is hight throughput
+/** @type {[from: string, to: string, highThroughput: boolean][]} */
 const craftConversions = [
     [unobtainium,   eludium,        false],
     [uranium,       thorium,        false],
@@ -71,7 +71,7 @@ const craftConversions = [
     [catnip,        wood,           true],
 ];
 
-// resource | enabled by default
+/** @type {[resource: string, defaultState: boolean][]} */
 const togglableCrafts = [
     [wood,          true],
     [beam,          true],
@@ -88,9 +88,10 @@ const togglableCrafts = [
     [eludium,       false],
 ];
 
-/**
- * Checkboxes
- */
+// #endregion
+
+// #region Checkbox helpers
+
 const toggleContainer = 'automationTogglesContainer';
 
 function insertToggleContainer() {
@@ -112,6 +113,11 @@ function insertToggleContainer() {
     footer.insertAdjacentHTML('afterbegin', container);
 }
 
+/**
+ * @typedef {{ resourceName: string, labelOverride: string, defaultState: boolean }} ToggleOptions
+ * @param {ToggleOptions} options
+ * @returns {() => boolean}
+ */
 function insertToggleFor(options) {
     const checkboxId = options.resourceName + 'Toggle';
     const label = options.labelOverride || (options.resourceName + ' craft');
@@ -131,8 +137,13 @@ function insertToggleFor(options) {
         .checked
 }
 
+/**
+ * @returns {(resourceName: string) => boolean}
+ */
 function insertCraftToggles() {
+    /** @type {Object.<string, () => boolean>} */
     const craftsMap = {};
+
     for (const [resource, defaultVal] of togglableCrafts) {
         craftsMap[resource] = insertToggleFor({
             resourceName: resource,
@@ -146,8 +157,13 @@ function insertCraftToggles() {
     }
 }
 
+/**
+ * @returns {(resourceName: string) => boolean}
+ */
 function insertActionToggles() {
+    /** @type {Object.<string, () => boolean>} */
     const actionsMap = {};
+
     for (const [resource, defaultVal, label] of togglableActions) {
         actionsMap[resource] = insertToggleFor({
             resourceName: resource,
@@ -162,8 +178,12 @@ function insertActionToggles() {
     }
 }
 
+// #endregion
+
+// #region Craft helpers
+
 /**
- * Craft helpers
+ * @param {string} selector
  */
 function tryUse(selector) {
     const element = document.querySelector(selector);
@@ -172,50 +192,133 @@ function tryUse(selector) {
     }
 }
 
+/**
+ * @param {string} resourceName
+ * @returns {Element | null}
+ */
 function isNearLimit(resourceName) {
     return document
         .querySelector('.resource_' + resourceName + ' .resLimitNotice');
 }
 
+/**
+ * @param {string} resourceName
+ */
 function craft1pc(resourceName) {
     tryUse('.resource_' + resourceName + ' .craft-1pc')
 }
 
+/**
+ * @param {string} resourceName
+ */
 function craft5pc(resourceName) {
     tryUse('.resource_' + resourceName + ' .craft-5pc')
 }
 
+/**
+ * @param {string} resourceName
+ */
 function craft10pc(resourceName) {
     tryUse('.resource_' + resourceName + ' .craft-10pc')
 }
 
+/**
+ * @param {string} resourceName
+ */
 function craftAll(resourceName) {
     tryUse('.resource_' + resourceName + ' .all')
 }
 
+// #endregion
+
+// #region Logic helpers
+
 /**
- * Custom actions
+ * @typedef {{ isNotReady: () => boolean, set: (value: number) => void }} Counter
+ * @returns {Counter}
  */
-function tryTradeWithLeviathans() {
-    const unobtainiumAmount = document
-        .querySelector('.resource_' + unobtainium + ' .resAmount');
-
-    if (!unobtainiumAmount
-        // 10K+ has characters which is NaN which is false
-        || +unobtainiumAmount.innerText < 5000
-    ) {
-        return;
+function getCounter() {
+    let counter = 0;
+    return {
+        isNotReady: () =>  {
+            const notReady = counter > 0;
+            if (notReady) {
+                counter--;
+            }
+            return notReady;
+        },
+        set: value => {
+            counter = value;
+        }
     }
-
-    [...document.getElementsByClassName('pin-link')]
-        .find(e => e.innerText == 'Trade with Leviathans')
-        ?.firstChild
-        .click();
 }
 
 /**
- * Main automation
+ * @param {() => number | null} action
+ * @returns {() => void}
  */
+function wrapInCounter(action) {
+    const counter = getCounter();
+
+    return () => {
+        if (counter.isNotReady()) {
+            return;
+        }
+
+        const newCounterValue = action();
+
+        if (newCounterValue) {
+            counter.set(newCounterValue);
+        }
+    };
+}
+
+// #endregion
+
+// #region Custom actions
+
+function getLeviathansTradeAction() {
+    return wrapInCounter(() => {
+
+        const unobtainiumAmount = document
+            .querySelector('.resource_' + unobtainium + ' .resAmount');
+
+        // check once a minute if we got unobtainium unlocked
+        if (!unobtainiumAmount) {
+            return 120;
+        }
+
+        // 10K+ has characters which is NaN which is false
+        if (+unobtainiumAmount.innerText < 5000) {
+            return null;
+        }
+
+        for (const element of document.getElementsByClassName('pin-link')) {
+            if (element.innerText === 'Trade with Leviathans') {
+                element.firstChild.click();
+                return null;
+            }
+        }
+
+        // wait 5s if trade link was not found
+        return 10;
+    });
+}
+
+function getParchmentCraftAction() {
+    return wrapInCounter(() => {
+
+        craftAll(parchment);
+
+        // try once every 2s to not spam
+        return 4;
+    });
+}
+
+// #endregion
+
+// #region Setup
+
 insertToggleContainer();
 
 const isEmergencyDumpingOff
@@ -235,12 +338,19 @@ const isActionDisabledFor = insertActionToggles();
 
 const isCraftDisabledFor = insertCraftToggles();
 
+const tryCraftParchment = getParchmentCraftAction();
+
+const tryTradeWithLeviathans = getLeviathansTradeAction();
 const isLeviathansTradeDisabled
     = insertToggleFor({
         resourceName: 'leviathansTrade',
         labelOverride: 'Leviathans trade',
         defaultState: false,
     })
+
+// #endregion
+
+// #region Main automation
 
 setInterval(() => {
 
@@ -279,7 +389,7 @@ setInterval(() => {
     }
 
     if (!isCraftDisabledFor(parchment)) {
-        craftAll(parchment);
+        tryCraftParchment();
     }
 
     if (!isLeviathansTradeDisabled()) {
@@ -287,3 +397,5 @@ setInterval(() => {
     }
 
 }, 500)
+
+// #endregion
